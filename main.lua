@@ -4,6 +4,7 @@ local is_menu = true
 local is_credit = false
 local is_music = false
 local is_option = false
+local is_play = false
 local h = 425
 success = love.window.setMode(1920, 1080)
 width = love.graphics.getWidth()
@@ -13,33 +14,48 @@ height = love.graphics.getHeight()
 		font = love.graphics.newFont("Stars Fighters Upright.ttf", 50)
 		love.graphics.setFont(font)
 		cursor = love.graphics.newImage("pointer_on_text-ConvertImage (1).png")
-
 		--menu = love.graphics.newImage("")
 	--background = love.graphics.newImage("")
 		y_credit = 700
 	    y_credit2 = 900
 	    y_credit3 = 1100
 	    y_credit4 = 1300
+	    timer = 0
+    	alpha = 0
+    	alpha_text = 0
+    	fadein  = 5
+    	display = 7
+    	fadeout = 4
+    	fadein_text  = 4
+    	display_text = 5
+    	fadeout_text = 6
 	    son_credit = love.audio.newSource("credits/credits.mp3", "stream")
+	    bg1 = love.graphics.newImage("bg1.png")
 	end
 
 function mouse_pos(x, y)
 	function love.mousepressed(x, y, button)
 		if (is_menu) then
 			if (y >= 400 and y <= 530  and x >= 740 and x <= 1070 and button == 1) then
-				print("PLAY TOUCHED")
+				is_option = false
+				is_menu = false
+				is_music = false
+				is_credit = false
+				is_play = true
 			end
 			if (y >= 535 and y <= 630 and x >= 695 and x <= 1115 and button == 1) then
 				is_option = true
 				is_menu = false
 				is_music = true
 				is_credit = false
+				is_play = false
 			end
 			if (y >= 650 and y <= 745 and x >= 695 and x <= 1115 and button == 1) then
 				is_credit = true
 				is_music = true
 				is_menu = false
 				is_option = false
+				is_play = false
 			end
 			if (y >= 760 and y <= 855 and x >= 800 and x <= 1055 and button == 1) then
 				love.event.quit(false)
@@ -57,6 +73,30 @@ end
 		if (is_menu) then
 			mouse_pos(x, y)
 		end
+		if (is_play) then
+			timer = (timer + dt)
+
+  			if timer < fadein then 
+    			alpha = timer / fadein
+  			elseif timer < display then 
+    			alpha = 1
+  			elseif timer < fadeout then
+    			alpha = 1- ((timer - display) / (fadeout - display))
+  			else 
+    			alpha = 255
+  			end
+  		end
+
+  		if timer < fadein then 
+    		alpha_text = timer / fadein_text
+  		elseif timer < display_text then 
+    		alpha_text = 1
+  		elseif timer < fadeout_text then
+    		alpha_text = 1- ((timer - display_text) / (fadeout_text - display_text))
+  		else 
+    		alpha_text = 0
+  		end
+
 		if (is_credit) then
 			if (y_credit > -90) then
 		        y_credit = y_credit - 1
@@ -89,6 +129,7 @@ function love.keypressed(key, scancode, isrepeat)
 	       is_credit = false
 	       is_music = false
 	       is_option = false
+	       is_play = false
 	       is_menu = true
 	   end
 	end
@@ -97,6 +138,7 @@ function love.keypressed(key, scancode, isrepeat)
 	       is_credit = false
 	       is_music = false
 	       is_option = false
+	       is_play = false
 	       is_menu = true
 	   end
 	end
@@ -104,16 +146,25 @@ function love.keypressed(key, scancode, isrepeat)
 		if key == "return" and h == 755 then
 			love.event.quit()
 		end
+		if key == "return" and h == 425 then
+			is_credit = false
+			is_music = false
+			is_menu = false
+			is_play = true
+			is_option = false
+		end
 		if key == "return" and h == 645 then
 			is_credit = true
 			is_music = true
 			is_menu = false
+			is_play = false
 			is_option = false
 		end
 		if key == "return" and h == 535 then
 			is_credit = false
 			is_music = true
 			is_menu = false
+			is_play = false
 			is_option = true
 		end
 		if key == "down" and h <= 675 then
@@ -125,29 +176,38 @@ function love.keypressed(key, scancode, isrepeat)
 	end
 end
 --affichage
-	function love.draw()
-		if (is_menu) then
-			is_music = false
-			love.graphics.draw(cursor, (width / 2) - 450, h, 0, 0.6, 0.6)
-			love.graphics.print("RUN IN TIME", (width / 2) - 350, 275)
-			love.graphics.print("PLAY", (width / 2) - 160, 425)
-			love.graphics.print("OPTIONS", (width / 2) - 265, 550)
-			love.graphics.print("CREDITS", (width / 2) - 265, 665)
-			love.graphics.print("EXIT", (width / 2) - 160, 775)
-		end
-		if (is_credit) then
-	        love.audio.play(son_credit)
-	        love.graphics.printf("Alexis Martin", 500, y_credit, 1000, "center")
-	        love.graphics.printf("Flavien Roche", 500, y_credit2, 1000, "center")
-	        love.graphics.printf("Thomas Bernad", 500, y_credit3, 1000, "center")
-	        love.graphics.printf("Leo Soule", 500, y_credit4, 1000, "center")
-    	end
-    	if (is_option) then
-    		love.graphics.setColor(255, 255, 255, 255)
-        	love.graphics.printf("You need to collect the differents pieces", 100, 120, 1800, "center")
-        	love.graphics.printf("in order the repair your time machine", 100, 350, 1800, "center")
-        	love.graphics.printf("and return to the right time", 100, 500, 1800, "center")
-        	love.graphics.setColor(150, 150, 0, 255)
-        	love.graphics.printf("Control your player with the arrows and jump with the space bar", 100, 750, 1800, "center")
-        end
+function love.draw()
+	if (is_play) then
+		font = love.graphics.newFont("rock2.ttf", 50)
+		love.graphics.setFont(font)
+		love.graphics.setColor(255, 255, 255, alpha)
+        love.graphics.draw(bg1)
+        love.graphics.setColor(255, 255, 255, alpha_text)
+        love.graphics.printf("Monde 1", 80, 300, 1800, "center")
+        love.graphics.printf("Prehistoire", 80, 450, 1800, "center")
+    end
+	if (is_menu) then
+		is_music = false
+		love.graphics.draw(cursor, (width / 2) - 450, h, 0, 0.6, 0.6)
+		love.graphics.print("RUN IN TIME", (width / 2) - 350, 275)
+		love.graphics.print("PLAY", (width / 2) - 160, 425)
+		love.graphics.print("OPTIONS", (width / 2) - 265, 550)
+		love.graphics.print("CREDITS", (width / 2) - 265, 665)
+		love.graphics.print("EXIT", (width / 2) - 160, 775)
 	end
+	if (is_credit) then
+	    love.audio.play(son_credit)
+	    love.graphics.printf("Alexis Martin", 500, y_credit, 1000, "center")
+	    love.graphics.printf("Flavien Roche", 500, y_credit2, 1000, "center")
+	    love.graphics.printf("Thomas Bernad", 500, y_credit3, 1000, "center")
+	    love.graphics.printf("Leo Soule", 500, y_credit4, 1000, "center")
+    end
+    if (is_option) then
+    	love.graphics.setColor(255, 255, 255, 255)
+       	love.graphics.printf("You need to collect the differents pieces", 100, 120, 1800, "center")
+        love.graphics.printf("in order the repair your time machine", 100, 350, 1800, "center")
+        love.graphics.printf("and return to the right time", 100, 500, 1800, "center")
+        love.graphics.setColor(150, 150, 0, 255)
+        love.graphics.printf("Control your player with the arrows and jump with the space bar", 100, 750, 1800, "center")
+    end
+end
