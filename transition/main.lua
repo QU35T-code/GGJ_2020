@@ -3,11 +3,16 @@ function love.load()
     is_option = 0
     timer = 0
     alpha = 0
+    alpha_text = 0
     fadein  = 5
     display = 7
-    fadeout = 9
-    font = love.graphics.newFont(18)
+    fadeout = 4
+    fadein_text  = 4
+    display_text = 5
+    fadeout_text = 6
+    font = love.graphics.newFont("rock2.ttf", 35)
     love.graphics.setFont(font)
+    image = love.graphics.newImage("")
 end
  
 -- Move nams.
@@ -21,7 +26,17 @@ function love.update(dt)
   elseif timer < fadeout then
     alpha = 1- ((timer - display) / (fadeout - display))
   else 
-    alpha = 0
+    alpha = 255
+  end
+
+  if timer < fadein then 
+    alpha_text = timer / fadein_text
+  elseif timer < display_text then 
+    alpha_text = 1
+  elseif timer < fadeout_text then
+    alpha_text = 1- ((timer - display_text) / (fadeout_text - display_text))
+  else 
+    alpha_text = 0
   end
 end
 
@@ -35,10 +50,9 @@ end
 function love.draw()
     if is_option == 0 then
         love.graphics.setColor(255, 255, 255, alpha)
-        love.graphics.printf("You need to collect the differents pieces", 100, 120, 700, "center")
-        love.graphics.printf("in order the repair your time machine", 100, 190, 700, "center")
-        love.graphics.printf("and return to the right time", 100, 260, 700, "center")
-        love.graphics.setColor(150, 150, 0, alpha)
-        love.graphics.printf("Control your player with the arrows and jump with the space bar", 100, 390, 700, "center")
+        love.graphics.draw(image)
+        love.graphics.setColor(255, 255, 255, alpha_text)
+        love.graphics.printf("Monde 1", 100, 120, 700, "center")
+        love.graphics.printf("Prehistoire", 100, 190, 700, "center")
     end
 end
