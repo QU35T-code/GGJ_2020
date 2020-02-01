@@ -5,6 +5,7 @@ local is_credit = false
 local is_music = false
 local is_option = false
 local is_play = false
+local is_pause = false
 local h = 425
 success = love.window.setMode(1920, 1080)
 width = love.graphics.getWidth()
@@ -31,6 +32,7 @@ height = love.graphics.getHeight()
     	fadeout_text = 6
 	    son_credit = love.audio.newSource("credits/credits.mp3", "stream")
 	    bg1 = love.graphics.newImage("bg1.png")
+	    pause = love.graphics.newImage("pause.png")
 	end
 
 function mouse_pos(x, y)
@@ -124,8 +126,19 @@ end
 
 
 function love.keypressed(key, scancode, isrepeat)
+	if (is_play) then
+		if key == 'escape' then
+			is_pause = true
+			is_credit = false
+	       	is_music = false
+	       	is_option = false
+	      	is_play = false
+	       	is_menu = false
+		end
+	end
 	if(is_credit) then
 	   if key == "escape" then
+	       is_pause = false
 	       is_credit = false
 	       is_music = false
 	       is_option = false
@@ -140,6 +153,7 @@ function love.keypressed(key, scancode, isrepeat)
 	       is_option = false
 	       is_play = false
 	       is_menu = true
+	       is_pause = false
 	   end
 	end
 	if (is_menu) then
@@ -151,6 +165,7 @@ function love.keypressed(key, scancode, isrepeat)
 			is_music = false
 			is_menu = false
 			is_play = true
+			is_pause = false
 			is_option = false
 		end
 		if key == "return" and h == 645 then
@@ -159,12 +174,14 @@ function love.keypressed(key, scancode, isrepeat)
 			is_menu = false
 			is_play = false
 			is_option = false
+			is_pause = false
 		end
 		if key == "return" and h == 535 then
 			is_credit = false
 			is_music = true
 			is_menu = false
 			is_play = false
+			is_pause = false
 			is_option = true
 		end
 		if key == "down" and h <= 675 then
@@ -177,6 +194,15 @@ function love.keypressed(key, scancode, isrepeat)
 end
 --affichage
 function love.draw()
+	if (is_pause) then
+		font = love.graphics.newFont(70)
+		love.graphics.draw(pause, 0, 0, 0, 1, 1.2)
+    	love.graphics.setFont(font)
+		love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.printf("PAUSE", 600, 100, 700, "center")
+        love.graphics.printf("RESTART", 50, 580, 700, "center")
+        love.graphics.printf("EXIT", 1200, 580, 700, "center")
+    end
 	if (is_play) then
 		font = love.graphics.newFont("rock2.ttf", 50)
 		love.graphics.setFont(font)
