@@ -1,282 +1,218 @@
--- VARIABLES
-local x, y
-local is_menu = true
-local is_game = false
-local is_pause = false
-local init = false
-local is_run = false
-local is_idle = true
+-- pour le menu (TITRE JEU, play, option, credits, exit)
 
--- SCREEN SIZE
+local is_menu = true
+local is_credit = false
+local is_music = false
+local is_option = false
+local h = 425
+local font_size = 50
+local is_play = false
+love.window.setMode(1920, 1020)
 width = love.graphics.getWidth()
 height = love.graphics.getHeight()
+--charge images etc
+	function love.load()
+		font = love.graphics.newFont("Stars Fighters Upright.ttf", font_size)
+		love.graphics.setFont(font)
+		cursor = love.graphics.newImage("pointer_on_text-ConvertImage (1).png")
+		background = love.graphics.newImage("menu_background.jpg")
+		sound_fx = love.audio.newSource("sound_check_menu.mp3", "stream")
+		enter_fx = love.audio.newSource("enter.mp3", "stream")
+		y_credit = 700
+	    y_credit2 = 900
+	    y_credit3 = 1100
+	    y_credit4 = 1300
+	    timer = 0
+    	alpha = 0
+    	alpha_text = 0
+    	fadein  = 5
+    	display = 7
+    	fadeout = 4
+    	fadein_text  = 4
+    	display_text = 5
+    	fadeout_text = 6
+	    son_credit = love.audio.newSource("credits.mp3", "stream")
+	    bg1 = love.graphics.newImage("bg1.png")
+	end
 
--- OBJET HERO
-hero = {}
-hero.images_idle = {}
-hero.images_idle_rev = {}
-hero.images_run = {}
-hero.images_run_rev = {}
-hero.frame = 1
-hero.x = width / 2
-hero.y = height / 2 - 105
-hero.width = 80
-hero.height = 88
-speed = 0.4
-
-function love.load()
-	-- LOAD WINDOW
-	love.window.setTitle("Santa_Claus")
-	love.window.setMode(800, 600)
-
-	-- LOAD IMAGES
-	menu = love.graphics.newImage("Images/Menu.png")
-	santa = love.graphics.newImage("sprites/Idle (1).png")
-	pause = love.graphics.newImage("Images/Pause.png")
-	background = love.graphics.newImage("Images/background.jpg")
-
-	-- LOAD IDLE
-	hero.images_idle[1] = love.graphics.newImage("sprites/Idle (1).png")
-	hero.images_idle[2] = love.graphics.newImage("sprites/Idle (2).png")
-	hero.images_idle[3] = love.graphics.newImage("sprites/Idle (3).png")
-	hero.images_idle[4] = love.graphics.newImage("sprites/Idle (4).png")
-	hero.images_idle[5] = love.graphics.newImage("sprites/Idle (5).png")
-	hero.images_idle[6] = love.graphics.newImage("sprites/Idle (6).png")
-	hero.images_idle[7] = love.graphics.newImage("sprites/Idle (7).png")
-	hero.images_idle[8] = love.graphics.newImage("sprites/Idle (8).png")
-	hero.images_idle[9] = love.graphics.newImage("sprites/Idle (9).png")
-	hero.images_idle[10] = love.graphics.newImage("sprites/Idle (10).png")
-	hero.images_idle[11] = love.graphics.newImage("sprites/Idle (11).png")
-	hero.images_idle[12] = love.graphics.newImage("sprites/Idle (12).png")
-	hero.images_idle[13] = love.graphics.newImage("sprites/Idle (13).png")
-	hero.images_idle[14] = love.graphics.newImage("sprites/Idle (14).png")
-	hero.images_idle[15] = love.graphics.newImage("sprites/Idle (15).png")
-	hero.images_idle[16] = love.graphics.newImage("sprites/Idle (16).png")
-
-	-- LOAD IDLE_REV
-	-- hero.images_idle_rev[1] = love.graphics.newImage("sprites/Idle (1)_rev.png")
-	-- hero.images_idle_rev[2] = love.graphics.newImage("sprites/Idle (2)_rev.png")
-	-- hero.images_idle_rev[3] = love.graphics.newImage("sprites/Idle (3)_rev.png")
-	-- hero.images_idle_rev[4] = love.graphics.newImage("sprites/Idle (4)_rev.png")
-	-- hero.images_idle_rev[5] = love.graphics.newImage("sprites/Idle (5)_rev.png")
-	-- hero.images_idle_rev[6] = love.graphics.newImage("sprites/Idle (6)_rev.png")
-	-- hero.images_idle_rev[7] = love.graphics.newImage("sprites/Idle (7)_rev.png")
-	-- hero.images_idle_rev[8] = love.graphics.newImage("sprites/Idle (8)_rev.png")
-	-- hero.images_idle_rev[9] = love.graphics.newImage("sprites/Idle (9)_rev.png")
-	-- hero.images_idle_rev[10] = love.graphics.newImage("sprites/Idle (10)_rev.png")
-	-- hero.images_idle_rev[11] = love.graphics.newImage("sprites/Idle (11)_rev.png")
-	-- hero.images_idle_rev[12] = love.graphics.newImage("sprites/Idle (12)_rev.png")
-	-- hero.images_idle_rev[13] = love.graphics.newImage("sprites/Idle (13)_rev.png")
-	-- hero.images_idle_rev[14] = love.graphics.newImage("sprites/Idle (14)_rev.png")
-	-- hero.images_idle_rev[15] = love.graphics.newImage("sprites/Idle (15)_rev.png")
-	-- hero.images_idle_rev[16] = love.graphics.newImage("sprites/Idle (16)_rev.png")
-
-	-- LOAD RUN
-	hero.images_run[1] = love.graphics.newImage("sprites/Run (1).png")
-	hero.images_run[2] = love.graphics.newImage("sprites/Run (2).png")
-	hero.images_run[3] = love.graphics.newImage("sprites/Run (3).png")
-	hero.images_run[4] = love.graphics.newImage("sprites/Run (4).png")
-	hero.images_run[5] = love.graphics.newImage("sprites/Run (5).png")
-	hero.images_run[6] = love.graphics.newImage("sprites/Run (6).png")
-	hero.images_run[7] = love.graphics.newImage("sprites/Run (7).png")
-	hero.images_run[8] = love.graphics.newImage("sprites/Run (8).png")
-	hero.images_run[9] = love.graphics.newImage("sprites/Run (9).png")
-	hero.images_run[10] = love.graphics.newImage("sprites/Run (10).png")
-	hero.images_run[11] = love.graphics.newImage("sprites/Run (11).png")
-
-	-- LOAD RUN_REV
-	-- hero.images_run_rev[1] = love.graphics.newImage("sprites/Run (1)_rev.png")
-	-- hero.images_run_rev[2] = love.graphics.newImage("sprites/Run (2)_rev.png")
-	-- hero.images_run_rev[3] = love.graphics.newImage("sprites/Run (3)_rev.png")
-	-- hero.images_run_rev[4] = love.graphics.newImage("sprites/Run (4)_rev.png")
-	-- hero.images_run_rev[5] = love.graphics.newImage("sprites/Run (5)_rev.png")
-	-- hero.images_run_rev[6] = love.graphics.newImage("sprites/Run (6)_rev.png")
-	-- hero.images_run_rev[7] = love.graphics.newImage("sprites/Run (7)_rev.png")
-	-- hero.images_run_rev[8] = love.graphics.newImage("sprites/Run (8)_rev.png")
-	-- hero.images_run_rev[9] = love.graphics.newImage("sprites/Run (9)_rev.png")
-	-- hero.images_run_rev[10] = love.graphics.newImage("sprites/Run (10)_rev.png")
-	-- hero.images_run_rev[11] = love.graphics.newImage("sprites/Run (11)_rev.png")
-
-
-
-	-- LOAD SOUND
-	sound_menu = love.audio.newSource("Musiques/menu.mp3", "stream")
-
-	if (is_menu) then
-		sound_menu:play()
-		sound_menu:setLooping(true)
+function mouse_pos(x, y)
+	function love.mousepressed(x, y, button)
+		if (is_menu) then
+			if (y >= 400 and y <= 530  and x >= 740 and x <= 1070 and button == 1) then
+				is_option = false
+				is_menu = false
+				is_music = false
+				is_credit = false
+				is_play = true
+			end
+			if (y >= 535 and y <= 630 and x >= 695 and x <= 1115 and button == 1) then
+				is_credit = false
+				is_menu = false
+				is_play = false
+				is_option = true
+			end
+			if (y >= 650 and y <= 745 and x >= 695 and x <= 1115 and button == 1) then
+				is_credit = true
+				is_music = true
+				is_menu = false
+				is_option = false
+			end
+			if (y >= 760 and y <= 855 and x >= 800 and x <= 1055 and button == 1) then
+				love.event.quit(false)
+			end
+		end
 	end
 end
 
-function love.update(dt)
-	--VARIABLES
-	x, y = love.mouse.getPosition()
-	
-	-- MENU
-	if (is_menu) then
-		mouse_pos_menu(x, y)
+--game loop:
+	function love.update(dt)
+		x, y = love.mouse.getPosition()
+		if (is_menu) then
+			mouse_pos(x, y)
+			love.audio.setVolume(0.5)
+			son_credit:play()
+			son_credit:setLooping(true)
+		end
+		if (is_play) then
+			timer = (timer + dt)
+  			if timer < fadein then 
+    			alpha = timer / fadein
+  			elseif timer < display then 
+    			alpha = 1
+  			elseif timer < fadeout then
+    			alpha = 1- ((timer - display) / (fadeout - display))
+  			else 
+    			alpha = 255
+  			end
+  		end
+  		if timer < fadein then 
+    		alpha_text = timer / fadein_text
+  		elseif timer < display_text then 
+    		alpha_text = 1
+  		elseif timer < fadeout_text then
+    		alpha_text = 1- ((timer - display_text) / (fadeout_text - display_text))
+  		else 
+    		alpha_text = 0
+  		end
+		if (is_credit) then
+			if (y_credit > -90) then
+		        y_credit = y_credit - 1
+		    else
+		        y_credit = 1200
+		    end
+		    if (y_credit2 > -90) then
+		        y_credit2 = y_credit2 - 1
+		    else
+		        y_credit2 = 1200
+		    end
+		    if (y_credit3 > -90) then
+		        y_credit3 = y_credit3 - 1
+		    else
+		        y_credit3 = 1200
+		    end
+		    if (y_credit4 > -90) then
+		        y_credit4 = y_credit4 - 1
+		    else
+		        y_credit4 = 1200
+		    end
+		end
 	end
 
-	-- IN GAME
-	if (is_game) then
-		sound_menu:pause()
-		is_run = false
-		is_idle = true
-		hero.frame = hero.frame + 10*dt
-		if (hero.frame >= #hero.images_idle + 1) then
-			hero.frame = 1
-		end
-		move_hero(x, y, dt)
-		collide_hero(x, y)
 
-		-- SET VAR PAUSE
-		if (love.keyboard.isDown("escape")) then
-			is_pause = true
-			is_game = false
+function love.keypressed(key, scancode, isrepeat)
+	if(is_credit) then
+	   if key == "escape" then
+			love.audio.setVolume(1.0)
+			sound_fx:play()
+	       	is_credit = false
+	       	is_menu = true
+	       	is_option = false
+	       	is_play = false
+	   	end
+	end
+	if(is_option) then
+	   if key == "escape" then
+	       	love.audio.setVolume(1.0)
+			sound_fx:play()
+	       	is_credit = false
+	       	is_menu = true
+	       	is_option = false
+	       	is_play = false
+	    end
+	end
+	if (is_menu) then
+		if key == "return" and h == 755 then
+			love.audio.setVolume(1.0)
+			enter_fx:play()
+			love.event.quit()
+		end
+		if key == "return" and h == 645 then
+			love.audio.setVolume(1.0)
+			enter_fx:play()
+			is_credit = true
 			is_menu = false
+	       	is_option = false
 		end
-	end
-
-	-- IN PAUSE
-	if (is_pause) then
-		sound_menu:pause()
-		mouse_pos_pause(x, y)
-	end
-
-end
-
-function love.draw()
-	-- MENU
-	if (is_menu) then
-		love.graphics.draw(menu, 0, 0)
-		love.graphics.print("Press 'o' to pause", 0, 0)
-		love.graphics.print("Press 'p' to play", 0, 20)
-	end
-
-	-- INIT
-	if (init) then
-		hero.x = 0
-		hero.y = height
-		hero.width = 80
-		hero.height = 88
-		is_game = true
-		init = false
-		is_idle = true
-		is_run = false
-	end
-
-	-- IN GAME
-	if (is_game) then
-		love.graphics.draw(background, 0, -279, 0, 0.6, 0.6)
-		local framearrondie = math.floor(hero.frame)
-		love.graphics.print("Press ESC to pause", 0, 0)
-		if (is_idle) then
-			love.graphics.draw(hero.images_idle[framearrondie], hero.x, hero.y - 100, 0, hero.width / 388, hero.height / 388)
+		if key == "return" and h == 535 then
+			love.audio.setVolume(1.0)
+			enter_fx:play()
+			is_credit = false
+			is_menu = false
+			is_play = false
+			is_option = true
 		end
-
-		if (is_run) then
-			love.graphics.draw(hero.images_run[framearrondie], hero.x, hero.y - 100, 0, hero.width / 388, hero.height / 388)
+		if key == "return" and h == 425 then
+			love.audio.setVolume(1.0)
+			enter_fx:play()
+			is_option = false
+			is_menu = false
+			is_music = false
+			is_credit = false
+			is_play = true
 		end
-	end
-
-	-- IN PAUSE
-	if (is_pause) then
-		love.graphics.draw(pause, 0, 0)
-	end
-end
-
-function move_hero(x, y, dt)
-	-- AVANCER
-	if (love.keyboard.isDown('z') or love.keyboard.isDown('up')) then
-		hero.y = hero.y - speed / 2
-	end
-
-	-- RECULER
-	if (love.keyboard.isDown('s') or love.keyboard.isDown('down')) then
-		hero.y = hero.y + speed
-	end
-
-	-- GAUCHE
-	if (love.keyboard.isDown('q') or love.keyboard.isDown('left')) then
-		hero.x = hero.x - speed
-	end
-
-	-- DROITE
-	if (love.keyboard.isDown('d') or love.keyboard.isDown('right')) then
-		is_idle = false
-		is_run = true
-		hero.x = hero.x + speed
-		hero.frame = hero.frame + 10*dt
-		if (hero.frame >= #hero.images_run + 1) then
-			hero.frame = 1
+		if key == "down" and h <= 675 then
+			h = h + 110
+			love.audio.setVolume(1.0)
+			sound_fx:play()
+		end
+		if key == "up" and h >= 515 then
+			h = h - 110
+			love.audio.setVolume(1.0)
+			sound_fx:play()
 		end
 	end
 end
-
-function mouse_pos_menu(x, y)
-	function love.mousepressed(x, y, button)
-		-- POS RECT PLAY
-		if (x > 386 and x < 691 and y > 70 and y < 255 and button == 1) then
-			init = true
-	    	is_menu = false
-			is_game = false
-	    end
-
-	    -- POS RECT QUIT
-	    if (x > 370 and x < 715 and y > 349 and y < 534 and button == 1) then
-	    	love.event.quit()
-	    end
+--affichage
+	function love.draw()
+		if (is_menu) then
+			love.graphics.draw(background, 0, 0, 0)
+			love.graphics.draw(cursor, (width / 2) - 450, h, 0, 0.6, 0.6)
+			love.graphics.print("RUN IN TIME", (width / 2) - 350, 275)
+			love.graphics.print("PLAY", (width / 2) - 160, 425)
+			love.graphics.print("OPTIONS", (width / 2) - 265, 550)
+			love.graphics.print("CREDITS", (width / 2) - 265, 665)
+			love.graphics.print("EXIT", (width / 2) - 160, 775)
+		end
+		if (is_credit) then
+	        love.graphics.printf("Alexis Martin", 500, y_credit, 1000, "center")
+	        love.graphics.printf("Flavien Roche", 500, y_credit2, 1000, "center")
+	        love.graphics.printf("Thomas Bernad", 500, y_credit3, 1000, "center")
+	        love.graphics.printf("Leo Soule", 500, y_credit4, 1000, "center")
+    	end
+        if (is_option) then
+			love.graphics.setFont(font)
+        	love.graphics.print("You need to collect the differents pieces", 400, 275)
+        	love.graphics.print("in order the repair your time machine", 400, 425)
+        	love.graphics.print("and return to the right time", 400, 550)
+        	love.graphics.print("Control your player with the arrows and jump with the space bar", 400, 775)
+        end
+        if (is_play) then
+			font = love.graphics.newFont("rock2.ttf", 40)
+			love.graphics.setFont(font)
+			love.graphics.setColor(255, 255, 255, alpha)
+        	love.graphics.draw(bg1, 0, 0, 0, 1, 1)
+        	love.graphics.setColor(255, 255, 255, alpha_text)
+        	love.graphics.printf("World 1", 80, 300, 1800, "center")
+        	love.graphics.printf("Prehistory", 80, 450, 1800, "center")
+    	end
 	end
-end
-
-function mouse_pos_pause(x, y)
-	-- POS RECT RESUME
-	function love.mousepressed(x, y, button)
-		if (x > 427 and x < 710 and y > 249 and y < 249 + 135 and button == 1) then
-			is_pause = false
-	    	is_menu = false
-			is_game = true
-	    end
-
-	    -- POS RECT MENU
-	    if (x > 517 and x < 722 and y > 451 and y < 574 and button == 1) then
-	    	is_pause = false
-	    	is_game = false
-	    	is_menu = true
-	    end
-	end
-end
-
-function collide_hero(x, y)
-	-- GAUCHE
-	if (hero.x <= 0 - 30) then
-		hero.x = - 30
-	end
-
-	-- DROITE
-	if (hero.x >= width - hero.width) then
-		hero.x = width - hero.width
-	end
-
-	-- HAUT
-	--[[if (hero.y <= 556) then
-		hero.y = 556
-	end--]]
-
-	-- BAS
-	--[[if (hero.y >= height - hero.height) then
-		hero.y = height - hero.height
-	end--]]
-end
-
-function love.keypressed(key)
-	-- PAUSE SOUND_MENU
-	if (love.keyboard.isDown('o')) then
-		sound_menu:pause()
-	end
-
-	-- PLAY SOUND_MENU
-	if (love.keyboard.isDown('p')) then
-		sound_menu:play()
-	end
-end
