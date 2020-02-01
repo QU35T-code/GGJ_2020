@@ -33,6 +33,7 @@ height = love.graphics.getHeight()
     	fadeout_text = 6
 	    son_credit = love.audio.newSource("credits.mp3", "stream")
 	    bg1 = love.graphics.newImage("bg1.png")
+        zqsd = love.graphics.newImage("zqsd.jpg")
 	end
 
 function mouse_pos(x, y)
@@ -200,11 +201,16 @@ end
 	        love.graphics.printf("Leo Soule", 500, y_credit4, 1000, "center")
     	end
         if (is_option) then
-			love.graphics.setFont(font)
-        	love.graphics.print("You need to collect the differents pieces", 400, 275)
-        	love.graphics.print("in order the repair your time machine", 400, 425)
-        	love.graphics.print("and return to the right time", 400, 550)
-        	love.graphics.print("Control your player with the arrows and jump with the space bar", 400, 775)
+            love.graphics.draw(zqsd, 200, 100, 0, 0.35, 0.35)
+            love.graphics.setColor(255, 255, 255, 255)
+            love.graphics.line(240, 690, 500, 690)
+            love.graphics.rectangle("line", 200, 650, 360, 80)
+            font = love.graphics.newFont("options.ttf", 40)
+            love.graphics.setFont(font)
+            love.graphics.printf("Use (Z, Q, S, D) to move your player forward, backward, to the left and to the right", 700, 200, 1100, "center")
+            love.graphics.printf("Press space bar to jump and collect the differents parts of the time machine", 700, 615, 1100, "center")
+            font = love.graphics.newFont("Stars Fighters Upright.ttf", 50)
+            love.graphics.setFont(font)
         end
         if (is_play) then
 			font = love.graphics.newFont("rock2.ttf", 40)
