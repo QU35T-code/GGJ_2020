@@ -33,7 +33,11 @@ is_destroy_1 = false
 is_destroy_2 = false
 is_destroy_3 = false
 is_destroy_4 = false
-compteur_pieces = 0
+compteur_piece_1 = 0
+compteur_piece_2 = 0
+compteur_piece_3 = 0
+compteur_piece_4 = 0
+
 -- SCREEN SIZE
 love.window.setMode(1920, 1080, fullscreen)
 width = love.graphics.getWidth()
@@ -68,8 +72,8 @@ function love.load()
 	-- LOAD IMAGES
 	background = love.graphics.newImage("Images/menu_background.jpg")
 	hero_dino = love.graphics.newImage("Dino_time/sprites/Idle/Idle_1.png")
-	pause = love.graphics.newImage("Images/Pause.png")
 	background_game_lv1 = love.graphics.newImage("Images/background.png")
+	background_game_lv2 = love.graphics.newImage("Images/lv2.jpg")
 
 
 	-- LOAD IDLE DINO
@@ -295,7 +299,7 @@ function love.update(dt)
 			hero.frame = 1
 		end
 		move_hero(x, y, dt)
-		--collide_hero(x, y)
+		collide_hero(x, y)
 
 		if (is_jump and is_ground == false) then
 			hero.y = hero.y - 200 * dt
@@ -322,9 +326,13 @@ function love.update(dt)
 			x_background = 0
 			x_background_2 = 1920
 		end
-
-
 		rotation_objects = rotation_objects + 4 * dt
+
+		if (compteur_piece_4 == 1 and compteur_piece_2 == 1 and compteur_piece_3 == 1 and compteur_piece_1 == 1 and hero.x >= 1700) then
+			is_validate = true
+			is_game = false
+			is_menu = false
+		end
 
 		-- SET VAR PAUSE
 		if (love.keyboard.isDown("escape")) then
@@ -367,6 +375,8 @@ end
 function love.draw()
 	-- MENU
 	if (is_menu and is_game == false) then
+		font = love.graphics.newFont("Polices/Stars Fighters Upright.ttf", 50)
+        love.graphics.setFont(font)
 		love.graphics.draw(background, 0, 0, 0)
 		love.graphics.draw(cursor, (width / 2) - 450, h, 0, 0.6, 0.6)
 		love.graphics.print("RUN IN TIME", (width / 2) - 350, 275)
@@ -393,17 +403,6 @@ function love.draw()
         font = love.graphics.newFont("Polices/Stars Fighters Upright.ttf", 50)
         love.graphics.setFont(font)
     end
-    --if (is_game and is_menu == false) then
-		-- font = love.graphics.newFont("Polices/rock2.ttf", 40)
-		-- love.graphics.setFont(font)
-		-- love.graphics.setColor(255, 255, 255, alpha)
-		-- is_letgo = true
-		-- --love.graphics.draw(background_game_lv1, 0, 0, 0, 1, 1)
-		-- --love.graphics.draw(objet_1, x_objet_1, y_objet_1, rotation_objects, 0.4, 0.4, 256 / 2, 256 / 2)
-  --   	love.graphics.setColor(255, 255, 255, alpha_text)
-  --   	love.graphics.printf("World 1", 80, 300, 1800, "center")
-  --   	love.graphics.printf("Prehistory", 80, 450, 1800, "center")
-    --end
 
 	-- INIT
 	if (init) then
@@ -439,6 +438,9 @@ function love.draw()
 		is_destroy_3 = false
 		is_destroy_4 = false
 		compteur_pieces = 0
+	end
+	if (is_validate and is_game == false and is_menu == false) then
+		love.graphics.draw(background_game_lv2, 0, 0)
 	end
 
 	-- IN GAME
@@ -621,20 +623,20 @@ end
 function collide_hero(x, y)
 	if (hero.x + hero.width >= x_objet_4 and hero.x <= x_objet_4 + hero.width and y_objet_4 >= hero.y - 100 and y_objet_4 <= hero.y + hero.height) then
 		is_destroy_4 = true
-		compteur_pieces = compteur_pieces + 1
+		compteur_piece_4 = 1
 	end
 	if (hero.x + hero.width >= x_objet_3 and hero.x <= x_objet_3 + hero.width and y_objet_3 >= hero.y - 100 and y_objet_3 <= hero.y + hero.height) then
 		is_destroy_3 = true
+		compteur_piece_3 = 1
 	end
 	if (hero.x + hero.width >= x_objet_2 and hero.x <= x_objet_2 + hero.width and y_objet_2 >= hero.y - 100 and y_objet_2 <= hero.y + hero.height) then
 		is_destroy_2 = true
+		compteur_piece_2 = 1
 	end
 	if (hero.x + hero.width >= x_objet_1 and hero.x <= x_objet_1 + hero.width and y_objet_1 >= hero.y - 100 and y_objet_1 <= hero.y + hero.height) then
 		is_destroy_1 = true
-		compteur_pieces = compteur_pieces + 1
+		compteur_piece_1 = 1
 	end
-	print(compteur_pieces)
-
 end
 
 function love.keypressed(key)
